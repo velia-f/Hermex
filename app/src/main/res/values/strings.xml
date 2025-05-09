@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">Hermex</string>
+    <string name="tag_cucina">Cucina</string>
+    <string name="tag_programmazione">Programmazione</string>
+    <string name="titolo">Titolo</string>
+    <string name="inserisci_il_titolo">Inserisci il titolo</string>
+    <string name="aggiungi_foto">Aggiungi foto</string>
+    <string name="descrizione">Descrizione</string>
+    <string name="plus_sign">+</string>
+    <string name="prezzo_minimo">Prezzo minimo</string>
+    <string name="example_value">Es: 20</string>
+    <string name="localizzazione">Località</string>
+    <string name="es_milano">Es: Borgo Valsugana Est</string>
+    <string name="scrivi_una_descrizione">Scrivi una descrizione</string>
+    <string name="aggiungi_una_foto_al_tuo_servizio">Aggiungi una foto al tuo servizio</string>
+    <string name="salva">Salva</string>
+    <string name="vendita_servizio">Vendita servizio</string>
+    <string name="aggiungi_una_tua_descrizione">Aggiungi una tua descrizione</string>
+    <string name="pagamento">Pagamento</string>
+    <string name="riscatta_il_tuo_certificato">Riscatta il tuo certificato</string>
+    <string name="acquista_coin">Acquista coin</string>
+    <string name="_1_coin_per_0_5_3_coin_per_1">1 coin per 0,5€\n3 coin per 1€</string>
+    <string name="condividendo_il_tuo_codice_si_guadagnano_dei_coin">Condividendo il tuo codice si guadagnano dei coin</string>
+    <string name="referral_code">Referral code</string>
+    <string name="inserisci_annuncio_vendita_servizio">Inserisci annuncio / vendita servizio</string>
+    <string name="guarda_ads">Guarda ads</string>
+    <string name="guadagna_coin">Guadagna coin</string>
+</resources>
