@@ -35,76 +35,95 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun GuadagnaCoinScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        // Top bar
-        Row(
+    Scaffold(
+        bottomBar = { BottomNavBar() }
+    ) { paddingValues ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.guadagna_coin),
-                style = MaterialTheme.typography.titleLarge
-            )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    imageVector = Icons.Default.MonetizationOn,
-                    contentDescription = null,
-                    tint = Color.Black
+            // Top bar non va
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.guadagna_coin),
+                    style = MaterialTheme.typography.titleLarge
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "10")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Default.MonetizationOn,
+                        contentDescription = null,
+                        tint = Color.Black
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = "10")
+                }
             }
+
+            // Card: Guarda Ads
+            ActionCard(
+                icon = Icons.Default.PlayArrow,
+                title = stringResource(R.string.guarda_ads),
+                subtitle = stringResource(R.string.guadagna_coin),
+                onClick = {
+                    // TODO: Guarda un video pubblicitario
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Card: Acquista Coin
+            ActionCard(
+                icon = Icons.Default.ShoppingCart,
+                title = stringResource(R.string.acquista_coin),
+                subtitle = stringResource(R.string._1_coin_per_0_5_3_coin_per_1),
+                onClick = {
+                    // TODO: Apri schermata di acquisto
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Card: Riscatta Certificato
+            ActionCard(
+                icon = Icons.Default.Receipt,
+                title = stringResource(R.string.riscatta_il_tuo_certificato),
+                subtitle = stringResource(R.string.pagamento),
+                onClick = {
+                    // TODO: Riscatta certificato
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Card: Inserisci Annuncio
+            ActionCard(
+                icon = Icons.Default.Add,
+                title = stringResource(R.string.inserisci_annuncio_vendita_servizio),
+                subtitle = null,
+                onClick = {
+                    // TODO: Inserisci annuncio
+                }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Referral Code
+            ActionCard(
+                icon = Icons.Default.Share,
+                title = stringResource(R.string.referral_code),
+                subtitle = stringResource(R.string.condividendo_il_tuo_codice_si_guadagnano_dei_coin),
+                onClick = {
+                    // TODO: Condividi referral
+                }
+            )
         }
-
-        // Card: Guarda Ads
-        ActionCard(
-            icon = Icons.Default.PlayArrow,
-            title = stringResource(R.string.guarda_ads),
-            subtitle = stringResource(R.string.guadagna_coin),
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Card: Acquista Coin
-        ActionCard(
-            icon = Icons.Default.ShoppingCart,
-            title = stringResource(R.string.acquista_coin),
-            subtitle = stringResource(R.string._1_coin_per_0_5_3_coin_per_1)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Card: Riscatta Certificato
-        ActionCard(
-            icon = Icons.Default.Receipt,
-            title = stringResource(R.string.riscatta_il_tuo_certificato),
-            subtitle = stringResource(R.string.pagamento)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        // Card: Inserisci Annuncio
-        ActionCard(
-            icon = Icons.Default.Add,
-            title = stringResource(R.string.inserisci_annuncio_vendita_servizio),
-            subtitle = null
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Referral Code
-        ActionCard(
-            icon = Icons.Default.Share,
-            title = stringResource(R.string.referral_code),
-            subtitle = stringResource(R.string.condividendo_il_tuo_codice_si_guadagnano_dei_coin),
-        )
     }
 }
 
@@ -112,23 +131,19 @@ fun GuadagnaCoinScreen() {
 fun ActionCard(
     icon: ImageVector?,
     title: String,
-    subtitle: String?
+    subtitle: String?,
+    onClick: () -> Unit
 ) {
     Card(
-    modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight(),
-    shape = RoundedCornerShape(8.dp),
-    border = BorderStroke(1.dp, Color.Black),
-    onClick = {
-        /* TODO: Salva azione
-        * serve differenziare per ogni parte una azione diversa
-        * */
-    }
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable { onClick() }, // QUI È DOVE LO USI
+        shape = RoundedCornerShape(8.dp),
+        border = BorderStroke(1.dp, Color.Black)
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
@@ -136,8 +151,7 @@ fun ActionCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.Black,
-                    modifier = Modifier
-                        .size(48.dp)
+                    modifier = Modifier.size(48.dp)
                 )
                 Spacer(modifier = Modifier.width(16.dp))
             }

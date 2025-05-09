@@ -25,4 +25,26 @@
     <string name="inserisci_annuncio_vendita_servizio">Inserisci annuncio / vendita servizio</string>
     <string name="guarda_ads">Guarda ads</string>
     <string name="guadagna_coin">Guadagna coin</string>
+    <string name="edit">Modifica</string>
+    <string name="back">Indietro</string>
+    <string name="profile">Profilo</string>
+    <string name="change_background">Cambia Profilo</string>
+    <string name="display_name">Username pubblico</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="log_out">Esci</string>
+    <string name="delete_profile">Cancella profilo</string>
+    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, s\ne l do eiusmod...</string>
+    <string name="service_title">Titolo del Servizio</string>
+    <string name="image">Immagine</string>
+    <string name="author_name">Nome dell\'autoru</string>
+    <string name="_4_0">" 4.0"</string>
+    <string name="buy">COMPRA</string>
+    <string name="contact">CONTATTA</string>
+    <string name="similar">Simili</string>
+    <string name="search_for_services">Cerca per attività</string>
+    <string name="home">Home</string>
+    <string name="aggiungi">Aggiungi</string>
+    <string name="cerca">Cerca</string>
+    <string name="guadagna">Guadagna</string>
 </resources>
