@@ -21,19 +21,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.hermex.ui.theme.HermexTheme
 
 
 @Composable
-fun VenditaServizioScreen() {
+fun VenditaServizioScreen(navController: NavController) {
     val titolo = remember { mutableStateOf("") }
     val descrizione = remember { mutableStateOf("") }
     val prezzo = remember { mutableStateOf("") }
     val localizzazione = remember { mutableStateOf("") }
 
-    Scaffold(
-        bottomBar = { BottomNavBar() }
-    ) { paddingValues ->
+    /*Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }
+    ) { paddingValues ->*/
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -48,13 +50,13 @@ fun VenditaServizioScreen() {
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { /* TODO: Azione back */ }) {
+                /*IconButton(onClick = { /* TODO: Azione back */ }) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_arrow_back),
                         contentDescription = stringResource(R.string.aggiungi_una_tua_descrizione),
                         tint = Color.White
                     )
-                }
+                }*/
 
                 Text(
                     text = stringResource(R.string.vendita_servizio),
@@ -67,14 +69,6 @@ fun VenditaServizioScreen() {
                 Button(
                     onClick = { /* TODO: Salva azione */ },
                     modifier = Modifier
-                        .padding(16.dp)
-                        .border(
-                            2.dp,
-                            Color.White,
-                            shape = RoundedCornerShape(8.dp)
-                        ),  // Bordo bianco
-                    /*colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),*/
-                    contentPadding = PaddingValues(16.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.salva),
@@ -196,12 +190,12 @@ fun VenditaServizioScreen() {
                         .padding(vertical = 8.dp)
                 )
             }
-        }
+    //    }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun VenditaServizioScreenPreview() {
-    VenditaServizioScreen()
+    VenditaServizioScreen(navController = rememberNavController())
 }

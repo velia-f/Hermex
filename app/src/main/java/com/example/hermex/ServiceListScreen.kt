@@ -38,12 +38,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun ServiceListScreen() {
-    Scaffold(
-        bottomBar = { BottomNavBar() }
-    ) { paddingValues ->
+fun ServiceListScreen(navController: NavController) {
+
+  /*  Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }
+    ) { paddingValues ->*/
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)) {
@@ -77,16 +80,20 @@ fun ServiceListScreen() {
             // lista servizi
             LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(3) {
-                    ServiceItem()
+                    ServiceItem(onClick = {
+                        navController.navigate(Screen.ServiceDetail.route)
+                    })
                 }
             }
         }
-    }
+   // }
 }
 
 @Composable
-fun ServiceItem() {
-    Column {
+fun ServiceItem(onClick: () -> Unit) {
+    Column (
+        modifier = Modifier.clickable { onClick() }
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -115,7 +122,6 @@ fun ServiceItem() {
                 }
             }
         }
-
         Divider(modifier = Modifier.padding(top = 8.dp))
     }
 }
@@ -123,5 +129,5 @@ fun ServiceItem() {
 @Preview(showBackground = true)
 @Composable
 fun ServiceListScreenPreview() {
-    ServiceListScreen()
+    ServiceListScreen(navController = rememberNavController())
 }

@@ -13,28 +13,37 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun ProfileScreen() {
-    Scaffold(
-        bottomBar = { BottomNavBar() }
-    ) { paddingValues ->
+fun ProfileScreen(navController: NavController) {
+    val scrollState = rememberScrollState()
+    /*Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }
+    ) { paddingValues ->*/
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
 
@@ -45,16 +54,17 @@ fun ProfileScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = {
+                /*Button(onClick = {
                     // TODO: Torna indietro
                 }) {
                     Text(stringResource(R.string.back))
-                }
+                }*/
 
                 Text(
                     text = stringResource(R.string.profile),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                                    //.align(Alignment.CenterHorizontally)
                 )
 
                 Button(onClick = {
@@ -92,25 +102,23 @@ fun ProfileScreen() {
             Spacer(modifier = Modifier.height(24.dp))
 
             // Display name
-            ProfileField(title = stringResource(R.string.display_name)) {
-                // TODO: Modifica nome visualizzato
-            }
+            ProfileTextField(title = stringResource(R.string.display_name))
+            //{ // TODO: Modifica nome visualizzato }
 
             // Email
-            ProfileField(title = stringResource(R.string.email)) {
-                // TODO: Modifica email
-            }
+            ProfileTextField(title = stringResource(R.string.email))
+            //{ // TODO: Modifica email }
 
             // Password
-            ProfileField(title = stringResource(R.string.password)) {
-                // TODO: Modifica password
-            }
+            ProfileTextField(title = stringResource(R.string.password))
+            //{ // TODO: Modifica password }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Log out
             ProfileButton(title = stringResource(R.string.log_out)) {
                 // TODO: Logout
+                navController.navigate(Screen.Login.route)
             }
 
             // Delete profile
@@ -118,7 +126,7 @@ fun ProfileScreen() {
                 // TODO: Cancella profilo
             }
         }
-    }
+  //  }
 }
 
 @Composable
@@ -139,6 +147,20 @@ fun ProfileField(title: String, onClick: () -> Unit) {
 }
 
 @Composable
+fun ProfileTextField(title: String) {
+    val textToSave = remember { mutableStateOf("") }
+    OutlinedTextField(
+        value = textToSave.value,
+        onValueChange = { textToSave.value = it /* TODO: salvare*/ },
+        placeholder = { Text(title) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        singleLine = true
+    )
+}
+
+@Composable
 fun ProfileButton(title: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
@@ -150,12 +172,11 @@ fun ProfileButton(title: String, onClick: () -> Unit) {
     ) {
         Text(title, color = Color.Black)
     }
-
     Spacer(modifier = Modifier.height(8.dp))
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ProfileScreenPreview() {
-    ProfileScreen()
+    ProfileScreen(navController = rememberNavController())
 }

@@ -32,15 +32,19 @@ import androidx.compose.ui.text.TextStyle
 import com.example.hermex.ui.theme.HermexTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun GuadagnaCoinScreen() {
-    Scaffold(
-        bottomBar = { BottomNavBar() }
-    ) { paddingValues ->
+fun GuadagnaCoinScreen(navController: NavController) {
+    val scrollState = rememberScrollState()
+    /*Scaffold(
+        bottomBar = { BottomNavBar(navController = navController) }
+    ) { paddingValues ->*/
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
             // Top bar non va
@@ -108,7 +112,7 @@ fun GuadagnaCoinScreen() {
                 title = stringResource(R.string.inserisci_annuncio_vendita_servizio),
                 subtitle = null,
                 onClick = {
-                    // TODO: Inserisci annuncio
+                    navController.navigate(Screen.Add.route)
                 }
             )
 
@@ -124,7 +128,7 @@ fun GuadagnaCoinScreen() {
                 }
             )
         }
-    }
+  //  }
 }
 
 @Composable
@@ -138,7 +142,7 @@ fun ActionCard(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { onClick() }, // QUI È DOVE LO USI
+            .clickable { onClick() },
         shape = RoundedCornerShape(8.dp),
         border = BorderStroke(1.dp, Color.Black)
     ) {
@@ -151,9 +155,9 @@ fun ActionCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.Black,
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(38.dp)
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
             }
             Column {
                 Text(
@@ -176,5 +180,5 @@ fun ActionCard(
 @Preview(showBackground = true)
 @Composable
 fun GuadagnaCoinScreenPreview() {
-    GuadagnaCoinScreen()
+    GuadagnaCoinScreen(navController = rememberNavController())
 }

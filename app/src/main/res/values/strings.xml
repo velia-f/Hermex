@@ -47,4 +47,8 @@
     <string name="aggiungi">Aggiungi</string>
     <string name="cerca">Cerca</string>
     <string name="guadagna">Guadagna</string>
+    <string name="per_favore_inserisci_email_e_password">Per favore, inserisci email e password</string>
+    <string name="login_effettuato_con_successo">Login effettuato con successo</string>
+    <string name="crea_profilo">Crea Profilo</string>
+    <string name="accedi">Accedi</string>
 </resources>

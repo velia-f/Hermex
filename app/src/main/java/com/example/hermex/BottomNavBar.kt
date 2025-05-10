@@ -7,31 +7,52 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.Text
+import androidx.compose.material3.NavigationBarItem
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
 
 data class NavItem(val label: String, val icon: ImageVector)
 
 @Composable
-fun BottomNavBar() {
-    val items = listOf(
-        NavItem(stringResource(R.string.home), Icons.Default.Home),
-        NavItem(stringResource(R.string.cerca), Icons.Default.Search),
-        NavItem(stringResource(R.string.aggiungi), Icons.Default.Add),
-        NavItem(stringResource(R.string.guadagna), Icons.Default.AttachMoney),
-        NavItem(stringResource(R.string.profile), Icons.Default.Person)
+fun BottomNavBar(navController: NavController) {
+    val screens = listOf(
+        Screen.Home,
+        Screen.Add,
+        Screen.Earn,
+        Screen.Profile
     )
 
-    var selectedItem by remember { mutableStateOf(0) }
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar {
-        items.forEachIndexed { index, item ->
+        screens.forEach { screen ->
             NavigationBarItem(
-                selected = selectedItem == index,
+                selected = currentRoute == screen.route,
                 onClick = {
-                    selectedItem = index
-                    // TODO: Gestisci la navigazione qui
+                    if (screen.route == Screen.Home.route) {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else if (screen.route == Screen.Earn.route) {
+                        navController.navigate(Screen.Earn.route) {
+                            popUpTo(Screen.Earn.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else {
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
                 },
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { Text(item.label) }
+                icon = { Icon(screen.icon, contentDescription = screen.label) },
+                label = { Text(screen.label) }
             )
         }
     }

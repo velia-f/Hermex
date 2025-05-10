@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HermexTheme {
-                VenditaServizioScreen()
+                MainScreen()
             }
         }
 
@@ -30,8 +30,8 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainActivityPreview() {
     HermexTheme {
-        VenditaServizioScreen()
+        MainScreen()
     }
 }
