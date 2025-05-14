@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -68,11 +69,11 @@ fun ServiceListScreen(navController: NavController) {
         OutlinedTextField(
             value = "",
             onValueChange = { /* TODO */ },
-            placeholder = { Text("Cerca un servizio...") },
+            placeholder = { Text(stringResource(R.string.search_for_services)) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -80,6 +81,7 @@ fun ServiceListScreen(navController: NavController) {
         // Lista servizi
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             items(5) {
+                Spacer(modifier = Modifier.height(10.dp))
                 ServiceItem(onClick = {
                     navController.navigate(Screen.ServiceDetail.route)
                 })
@@ -110,24 +112,39 @@ fun ServiceItem(onClick: () -> Unit) {
 
             Column(modifier = Modifier.weight(1f)) {
                 Text("Titolo del servizio", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                Text("Una descrizione breve del servizio disponibile.", fontSize = 14.sp, color = Color.Gray)
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.scale(0.8f)
+                    ) {
+                        repeat(4) {
+                            Icon(
+                                imageVector = Icons.Default.Star,
+                                contentDescription = null,
+                                tint = Color(0xFFFFC107),
+                                modifier = Modifier.size(16.dp) // Stelle più piccole
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        //Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            "4.0",
+                            fontSize = 12.sp,
+                            color = Color.Gray
+                        )
+                    }
+                }
+                Text("Una descrizione breve del servizio disponibile.", fontSize = 10.sp, color = Color.Gray)
                 Text("Autore: Mario Rossi", fontSize = 12.sp, color = Color.DarkGray)
             }
 
             Spacer(modifier = Modifier.width(8.dp))
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row {
-                    repeat(4) {
-                        Icon(Icons.Default.Star, contentDescription = null, tint = Color(0xFFFFC107))
-                    }
-                    Icon(Icons.Default.Star, contentDescription = null, tint = Color.LightGray)
-                }
-                Text("4.0", fontSize = 12.sp, color = Color.Gray)
-            }
         }
-
-        Divider(modifier = Modifier.padding(top = 16.dp))
     }
 }
 
