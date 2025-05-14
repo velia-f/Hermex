@@ -35,12 +35,33 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import android.app.DatePickerDialog
+import java.util.Calendar
+import android.net.Uri
+import android.provider.MediaStore
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmapConfig
+import coil.compose.rememberAsyncImagePainter
+
 
 @Composable
 fun RegisterScreen(navController: NavController) {
     val context = LocalContext.current
 
-    var profilePicture by remember { mutableStateOf("X") } // Placeholder immagine profilo
+    var profilePictureUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        profilePictureUri = uri
+    }
+
     var username by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -66,32 +87,96 @@ fun RegisterScreen(navController: NavController) {
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .background(Color.LightGray, shape = RoundedCornerShape(12.dp))
-                .align(Alignment.CenterHorizontally),
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.LightGray)
+                .align(Alignment.CenterHorizontally)
+                .clickable { launcher.launch("image/*") },
             contentAlignment = Alignment.Center
         ) {
-            Text(profilePicture, style = MaterialTheme.typography.displayMedium)
+            if (profilePictureUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(profilePictureUri),
+                    contentDescription = "Immagine profilo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Text("Aggiungi", style = MaterialTheme.typography.titleMedium)
+            }
         }
+
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Username
-        RegisterTextField(value = username, onValueChange = { username = it }, label = "Username")
+        RegisterTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = "Username"
+        )
 
         // Nome
-        RegisterTextField(value = firstName, onValueChange = { firstName = it }, label = "Nome")
+        RegisterTextField(
+            value = firstName,
+            onValueChange = { firstName = it },
+            label = "Nome"
+        )
 
         // Cognome
-        RegisterTextField(value = lastName, onValueChange = { lastName = it }, label = "Cognome")
+        RegisterTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = "Cognome"
+        )
 
         // Email
-        RegisterTextField(value = email, onValueChange = { email = it }, label = "Email", keyboardType = KeyboardType.Email)
+        RegisterTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = "Email",
+            keyboardType = KeyboardType.Email
+        )
 
         // Data di nascita
-        RegisterTextField(value = birthDate, onValueChange = { birthDate = it }, label = "Data di nascita")
+        val calendar = Calendar.getInstance()
+        val datePickerDialog = remember {
+            DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    birthDate = "%02d/%02d/%d".format(dayOfMonth, month + 1, year)
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .clickable { datePickerDialog.show() }
+        ) {
+            OutlinedTextField(
+                value = birthDate,
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Data di nascita") },
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true,
+                enabled = false, // toglie ambiguità nel focus e click
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
 
         // Password
-        RegisterTextField(value = password, onValueChange = { password = it }, label = "Password", isPassword = true)
+        RegisterTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = "Password",
+            isPassword = true
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -106,7 +191,7 @@ fun RegisterScreen(navController: NavController) {
                 onCheckedChange = { acceptPrivacy = it }
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Accetto la Privacy Policy", style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.accetto_la_privacy_policy), style = MaterialTheme.typography.bodyMedium)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -128,7 +213,7 @@ fun RegisterScreen(navController: NavController) {
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
         ) {
-            Text("Registrati", color = Color.White)
+            Text(stringResource(R.string.registrati), color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
