@@ -1,5 +1,6 @@
 package com.example.hermex
 
+import android.content.Intent
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.text.TextStyle
 import com.example.hermex.ui.theme.HermexTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -38,6 +40,9 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun GuadagnaCoinScreen(navController: NavController) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    val openDialog = remember { mutableStateOf(false) }
+    val dialogTitle = remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -88,21 +93,30 @@ fun GuadagnaCoinScreen(navController: NavController) {
                 icon = Icons.Default.PlayArrow,
                 title = stringResource(R.string.guarda_ads),
                 subtitle = stringResource(R.string.guadagna_coin),
-                onClick = { /* TODO */ }
+                onClick = {
+                    dialogTitle.value = "Guarda Ads"
+                    openDialog.value = true
+                }
             )
 
             ActionCardStyled(
                 icon = Icons.Default.ShoppingCart,
                 title = stringResource(R.string.acquista_coin),
                 subtitle = stringResource(R.string._1_coin_per_0_5_3_coin_per_1),
-                onClick = { /* TODO */ }
+                onClick = {
+                    dialogTitle.value = "Acquista Coin"
+                    openDialog.value = true
+                }
             )
 
             ActionCardStyled(
                 icon = Icons.Default.Receipt,
                 title = stringResource(R.string.riscatta_il_tuo_certificato),
                 subtitle = stringResource(R.string.pagamento),
-                onClick = { /* TODO */ }
+                onClick = {
+                    dialogTitle.value = "Riscatta certificato"
+                    openDialog.value = true
+                }
             )
 
             ActionCardStyled(
@@ -118,11 +132,36 @@ fun GuadagnaCoinScreen(navController: NavController) {
                 icon = Icons.Default.Share,
                 title = stringResource(R.string.referral_code),
                 subtitle = stringResource(R.string.condividendo_il_tuo_codice_si_guadagnano_dei_coin),
-                onClick = { /* TODO */ }
+                onClick = {
+                    val sendIntent = Intent().apply {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_TEXT, "Usa il mio codice referral: ABC123 per guadagnare coin!")
+                        type = "text/plain"
+                    }
+                    val shareIntent = Intent.createChooser(sendIntent, null)
+                    context.startActivity(shareIntent)
+                }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
         }
+        if (openDialog.value) {
+            AlertDialog(
+                onDismissRequest = { openDialog.value = false },
+                confirmButton = {
+                    TextButton(onClick = { openDialog.value = false }) {
+                        Text("Grazie :)")
+                    }
+                },
+                title = {
+                    Text(dialogTitle.value)
+                },
+                text = {
+                    Text("Siamo lavorando per Te e per darti il meglio\nAncora un attimo ;)")
+                }
+            )
+        }
+
     }
 }
 
