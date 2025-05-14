@@ -1,5 +1,8 @@
 package com.example.hermex
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,24 +10,94 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+
+@Composable
+fun ContactButton(email: String) {
+    val context = LocalContext.current
+    var showDialog by remember { mutableStateOf(false) }
+
+    OutlinedButton(
+        onClick = { showDialog = true },
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = Color(0xFF2575FC)
+        ),
+        border = BorderStroke(1.dp, Color(0xFF2575FC))
+    ) {
+        Text(text = stringResource(R.string.contact))
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Chiudi")
+                }
+            },
+            title = { Text("Contatta la persona") },
+            text = {
+                val annotatedString = buildAnnotatedString {
+                    append("Puoi contattare la persona via email: ")
+                    pushStringAnnotation(
+                        tag = "EMAIL",
+                        annotation = "mailto:$email"
+                    )
+                    withStyle(style = SpanStyle(color = Color(0xFF2575FC), textDecoration = TextDecoration.Underline)) {
+                        append(email)
+                    }
+                    pop()
+                }
+
+                ClickableText(
+                    text = annotatedString,
+                    onClick = { offset ->
+                        annotatedString.getStringAnnotations(tag = "EMAIL", start = offset, end = offset)
+                            .firstOrNull()?.let { annotation ->
+                                val intent = Intent(Intent.ACTION_SENDTO).apply {
+                                    data = Uri.parse(annotation.item)
+                                }
+                                try {
+                                    context.startActivity(intent)
+                                } catch (e: Exception) {
+                                    Toast.makeText(context, "Nessuna app per email trovata.", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                    }
+                )
+            }
+        )
+    }
+}
+
 
 @Composable
 fun ServiceDetailScreen(navController: NavController) {
@@ -120,16 +193,7 @@ fun ServiceDetailScreen(navController: NavController) {
                 Text(text = stringResource(R.string.buy))
             }
 
-            OutlinedButton(
-                onClick = { /* TODO: Contatta */ },
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color(0xFF2575FC)
-                ),
-                border = BorderStroke(1.dp, Color(0xFF2575FC))
-            ) {
-                Text(text = stringResource(R.string.contact))
-            }
+            ContactButton(email = "example@example.com")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
