@@ -10,5 +10,6 @@ sealed class Screen(val route: String, val label: String, val icon: ImageVector)
     object Earn : Screen("earn", "Guadagna", Icons.Filled.AttachMoney)
     object Add : Screen("add", "Aggiungi", Icons.Filled.Add)
     object ServiceDetail : Screen("serviceDetail", "Dettaglio", Icons.Filled.Info)
-    object Login : Screen("login", "Login", Icons.Filled.Info)
+    object Login : Screen("login", "Login", Icons.Filled.Person)
+    object RegisterScreen : Screen("registerScreen", "Registrati", Icons.Filled.Person)
 }

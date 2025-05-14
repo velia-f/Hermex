@@ -27,6 +27,7 @@ fun MainScreen() {
             composable(Screen.Profile.route) { ProfileScreen(navController) }
             composable(Screen.ServiceDetail.route) { ServiceDetailScreen(navController) }
             composable(Screen.Login.route) { LoginScreen(navController) }
+            composable(Screen.RegisterScreen.route) { RegisterScreen(navController) }
 
         }
     }

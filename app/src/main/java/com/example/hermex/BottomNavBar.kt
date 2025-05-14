@@ -41,6 +41,21 @@ fun BottomNavBar(navController: NavController) {
                             popUpTo(Screen.Earn.route) { inclusive = true }
                             launchSingleTop = true
                         }
+                    } else if (screen.route == Screen.Profile.route) {
+                        navController.navigate(Screen.Profile.route) {
+                            popUpTo(Screen.Profile.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else if (screen.route == Screen.Add.route) {
+                        navController.navigate(Screen.Add.route) {
+                            popUpTo(Screen.Add.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    } else if (screen.route == Screen.ServiceDetail.route) {
+                        navController.navigate(Screen.ServiceDetail.route) {
+                            popUpTo(Screen.ServiceDetail.route) { inclusive = true }
+                            launchSingleTop = true
+                        }
                     } else {
                         navController.navigate(screen.route) {
                             popUpTo(navController.graph.startDestinationId) {
