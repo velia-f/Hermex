@@ -170,7 +170,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintWidth_max="488dp"
             android:autofillHints="text"
-            android:hint="@string/example_value"
+            android:hint="@string/example_value_price"
             android:inputType="number"
             android:minHeight="48dp"
             app:layout_constraintEnd_toEndOf="parent"
