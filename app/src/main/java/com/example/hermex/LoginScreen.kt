@@ -117,9 +117,9 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Crea profilo
-        OutlinedButton(
+        Button(
             onClick = {
-                // navController.navigate(Screen.CreateProfile.route)
+                navController.navigate(Screen.RegisterScreen.route)
             },
             modifier = Modifier
                 .fillMaxWidth()
