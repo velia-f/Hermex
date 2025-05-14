@@ -149,15 +149,25 @@ fun ServiceDetailScreen(navController: NavController) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             repeat(4) {
-                Box(
+                OutlinedButton(
                     modifier = Modifier
                         .size(100.dp)
                         .shadow(4.dp, RoundedCornerShape(12.dp))
                         .background(Color.White, RoundedCornerShape(12.dp))
                         .clickable { /* TODO */ },
-                    contentAlignment = Alignment.Center
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFF2575FC)
+                    ),
+                    border = BorderStroke(1.dp, Color(0xFF2575FC)),
+                    onClick = {
+                        navController.navigate(Screen.ServiceDetail.route)//da modificare tale per cui vada nella pagina con idpost giusto
+                    },
                 ) {
-                    Text("Servizio ${it + 1}", color = Color(0xFF2575FC), fontWeight = FontWeight.SemiBold)
+                    Text(
+                        "Servizio ${it + 1}",
+                        color = Color(0xFF2575FC)
+                    )
                 }
             }
         }
