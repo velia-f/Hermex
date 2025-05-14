@@ -20,102 +20,118 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
-    var isLoginEnabled by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(horizontal = 24.dp, vertical = 48.dp),
+        verticalArrangement = Arrangement.Center
     ) {
-        // Title
         Text(
             text = "Accedi al tuo account",
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             modifier = Modifier.padding(bottom = 32.dp)
         )
 
-        // Email Field
+        // Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Email") },
+            placeholder = { Text("Email") },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Email"
+                )
+            },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
             ),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Password Field
+        // Password
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text(stringResource(R.string.password)) },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = stringResource(R.string.password)) },
+            placeholder = { Text(stringResource(R.string.password)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = stringResource(R.string.password)
+                )
+            },
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done
             ),
             visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            shape = RoundedCornerShape(12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 32.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Login Button
+        // Accedi
         Button(
             onClick = {
-                // Placeholder per logica login
-                // TODO: controllo creds
                 if (email.text.isEmpty() || password.text.isEmpty()) {
                     Toast.makeText(
-                        navController.context,
+                        context,
                         context.getString(R.string.per_favore_inserisci_email_e_password),
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     Toast.makeText(
-                        navController.context,
+                        context,
                         context.getString(R.string.login_effettuato_con_successo),
                         Toast.LENGTH_SHORT
                     ).show()
                     navController.navigate(Screen.Home.route)
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(50),
-            enabled = isLoginEnabled
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
         ) {
-            Text(text = stringResource(R.string.accedi))
+            Text(text = stringResource(R.string.accedi), color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // Crea profilo
         OutlinedButton(
             onClick = {
-                //navController.navigate(Screen.CreateProfile.route)
+                // navController.navigate(Screen.CreateProfile.route)
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(50)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF1E88E5))
         ) {
             Text(text = stringResource(R.string.crea_profilo))
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

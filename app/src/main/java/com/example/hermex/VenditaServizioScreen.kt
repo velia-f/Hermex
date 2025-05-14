@@ -33,166 +33,132 @@ fun VenditaServizioScreen(navController: NavController) {
     val prezzo = remember { mutableStateOf("") }
     val localizzazione = remember { mutableStateOf("") }
 
-    /*Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }
-    ) { paddingValues ->*/
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // Header
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(Color.White)
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(Color(0xFF2575FC)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Barra in alto
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
-                    .background(Color(0xFF979D9C))
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
+            Text(
+                text = stringResource(R.string.vendita_servizio),
+                modifier = Modifier.padding(start = 16.dp),
+                style = MaterialTheme.typography.titleLarge,
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+            Button(
+                onClick = { /* TODO: Salva */ },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(end = 16.dp)
             ) {
-                /*IconButton(onClick = { /* TODO: Azione back */ }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_arrow_back),
-                        contentDescription = stringResource(R.string.aggiungi_una_tua_descrizione),
-                        tint = Color.White
-                    )
-                }*/
-
                 Text(
-                    text = stringResource(R.string.vendita_servizio),
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    color = Color(0xFF3D3F42),
+                    text = stringResource(R.string.salva),
+                    color = Color(0xFF2575FC),
                     fontWeight = FontWeight.Bold
                 )
-                Button(
-                    onClick = { /* TODO: Salva azione */ },
-                    modifier = Modifier
-                ) {
-                    Text(
-                        text = stringResource(R.string.salva),
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
             }
+        }
 
-            Column(
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Titolo
+            Text("Titolo", fontWeight = FontWeight.Bold)
+            OutlinedTextField(
+                value = titolo.value,
+                onValueChange = { titolo.value = it },
+                placeholder = { Text("Inserisci il titolo") },
                 modifier = Modifier
-                    .padding(16.dp)
-                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                singleLine = true
+            )
+
+            // Box per immagine
+            Text("Aggiungi una foto", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+            Box(
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFF2575FC).copy(alpha = 0.2f))
+                    .border(2.dp, Color(0xFF2575FC), RoundedCornerShape(16.dp))
+                    .clickable { /* TODO: Aggiungi foto */ },
+                contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(R.string.titolo), fontWeight = FontWeight.Bold)
-                OutlinedTextField(
-                    value = titolo.value,
-                    onValueChange = { titolo.value = it },
-                    placeholder = { Text(stringResource(R.string.inserisci_il_titolo)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    singleLine = true
-                )
-
-                Text(
-                    text = stringResource(R.string.aggiungi_foto),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)  // Imposta la dimensione del pulsante
-                        .background(
-                            Color.Gray,
-                            shape = RoundedCornerShape(8.dp)
-                        )  // Imposta il background con angoli arrotondati
-                        .border(
-                            1.dp,
-                            Color.Gray,
-                            shape = RoundedCornerShape(8.dp)
-                        )  // Imposta un bordo grigio
-                        .clickable { /* Gestisci il click */ },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "+",  // Il simbolo "+" al centro
-                        fontSize = 36.sp,  // Dimensione del simbolo
-                        color = Color.White
-                    )
-                }
-
-
-                Text(
-                    text = stringResource(R.string.descrizione),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                OutlinedTextField(
-                    value = descrizione.value,
-                    onValueChange = { descrizione.value = it },
-                    placeholder = { Text(stringResource(R.string.scrivi_una_descrizione)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp),
-                    singleLine = false,
-                    maxLines = 4
-                )
-
-                Row(modifier = Modifier.padding(top = 8.dp)) {
-                    Button(
-                        onClick = { },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors()
-                    ) {
-                        Text(stringResource(R.string.tag_cucina))
-                    }
-                    Button(
-                        onClick = { },
-                        modifier = Modifier.padding(end = 8.dp),
-                        colors = ButtonDefaults.outlinedButtonColors()
-                    ) {
-                        Text(stringResource(R.string.tag_programmazione))
-                    }
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.outlinedButtonColors()
-                    ) {
-                        Text("+", color = Color(0xFF00796B))
-                    }
-                }
-
-                Text(
-                    text = stringResource(R.string.prezzo_minimo),
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                OutlinedTextField(
-                    value = prezzo.value,
-                    onValueChange = { prezzo.value = it },
-                    placeholder = { Text(stringResource(R.string.example_value)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                )
-
-                Text(
-                    text = stringResource(R.string.localizzazione),
-                    modifier = Modifier.padding(top = 16.dp)
-                )
-                OutlinedTextField(
-                    value = localizzazione.value,
-                    onValueChange = { localizzazione.value = it },
-                    placeholder = { Text(stringResource(R.string.es_milano)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                )
+                Text("+", fontSize = 36.sp, color = Color(0xFF2575FC), fontWeight = FontWeight.Bold)
             }
-    //    }
+
+            // Descrizione
+            Text("Descrizione", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+            OutlinedTextField(
+                value = descrizione.value,
+                onValueChange = { descrizione.value = it },
+                placeholder = { Text("Scrivi una descrizione") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .padding(vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                maxLines = 4
+            )
+
+            // Tag
+            Text("Categorie", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                listOf("Cucina", "Programmazione", "+").forEach { tag ->
+                    OutlinedButton(
+                        onClick = { /* TODO */ },
+                        shape = RoundedCornerShape(20.dp),
+                        border = BorderStroke(1.dp, Color(0xFF2575FC)),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = if (tag == "+") Color(0xFF00796B) else Color(0xFF2575FC)
+                        )
+                    ) {
+                        Text(tag)
+                    }
+                }
+            }
+
+            // Prezzo
+            Text("Prezzo minimo", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+            OutlinedTextField(
+                value = prezzo.value,
+                onValueChange = { prezzo.value = it },
+                placeholder = { Text("€15.00") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+
+            // Localizzazione
+            Text("Localizzazione", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
+            OutlinedTextField(
+                value = localizzazione.value,
+                onValueChange = { localizzazione.value = it },
+                placeholder = { Text("Es. Milano") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                shape = RoundedCornerShape(12.dp)
+            )
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

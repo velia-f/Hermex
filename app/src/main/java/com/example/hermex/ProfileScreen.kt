@@ -29,150 +29,125 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
 @Composable
 fun ProfileScreen(navController: NavController) {
     val scrollState = rememberScrollState()
-    /*Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }
-    ) { paddingValues ->*/
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp)
-        ) {
 
-            // Top bar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                /*Button(onClick = {
-                    // TODO: Torna indietro
-                }) {
-                    Text(stringResource(R.string.back))
-                }*/
-
-                Text(
-                    text = stringResource(R.string.profile),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                                    //.align(Alignment.CenterHorizontally)
-                )
-
-                Button(onClick = {
-                    // TODO: Modifica profilo
-                }) {
-                    Text(stringResource(R.string.edit))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Profile picture placeholder
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .background(Color.LightGray, shape = RoundedCornerShape(8.dp))
-                    .align(Alignment.CenterHorizontally),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("X", style = MaterialTheme.typography.displayMedium)
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Change background button
-            Button(
-                onClick = {
-                    // TODO: Cambia sfondo
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(stringResource(R.string.change_background))
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Display name
-            ProfileTextField(title = stringResource(R.string.display_name))
-            //{ // TODO: Modifica nome visualizzato }
-
-            // Email
-            ProfileTextField(title = stringResource(R.string.email))
-            //{ // TODO: Modifica email }
-
-            // Password
-            ProfileTextField(title = stringResource(R.string.password))
-            //{ // TODO: Modifica password }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Log out
-            ProfileButton(title = stringResource(R.string.log_out)) {
-                // TODO: Logout
-                navController.navigate(Screen.Login.route)
-            }
-
-            // Delete profile
-            ProfileButton(title = stringResource(R.string.delete_profile)) {
-                // TODO: Cancella profilo
-            }
-        }
-  //  }
-}
-
-@Composable
-fun ProfileField(title: String, onClick: () -> Unit) {
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .border(1.dp, Color.Black, shape = RoundedCornerShape(6.dp))
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(16.dp)
     ) {
-        Text(text = title, style = MaterialTheme.typography.bodyLarge)
-    }
+        // Top bar
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.profile),
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+            )
 
-    Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.edit),
+                color = Color(0xFF1E88E5),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .clickable { /* TODO */ }
+                    .padding(8.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Profile picture placeholder
+        Box(
+            modifier = Modifier
+                .size(140.dp)
+                .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(100.dp))
+                .align(Alignment.CenterHorizontally)
+                .border(2.dp, Color.Black, RoundedCornerShape(100.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("👤", fontSize = 48.sp)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            text = stringResource(R.string.change_background),
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .clickable { /* TODO */ }
+                .padding(4.dp),
+            color = Color(0xFF1E88E5),
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Fields
+        ProfileTextField(title = stringResource(R.string.display_name))
+        ProfileTextField(title = stringResource(R.string.email))
+        ProfileTextField(title = stringResource(R.string.password))
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Action buttons
+        ProfileButton(
+            title = stringResource(R.string.log_out),
+            bgColor = Color(0xFFEEEEEE),
+            textColor = Color.Black
+        ) {
+            navController.navigate(Screen.Login.route)
+        }
+
+        ProfileButton(
+            title = stringResource(R.string.delete_profile),
+            bgColor = Color(0xFFEF5350),
+            textColor = Color.White
+        ) {
+            // TODO: Cancella profilo
+        }
+    }
 }
 
 @Composable
 fun ProfileTextField(title: String) {
-    val textToSave = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf("") }
     OutlinedTextField(
-        value = textToSave.value,
-        onValueChange = { textToSave.value = it /* TODO: salvare*/ },
+        value = text.value,
+        onValueChange = { text.value = it },
         placeholder = { Text(title) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 6.dp),
+        shape = RoundedCornerShape(12.dp),
         singleLine = true
     )
 }
 
 @Composable
-fun ProfileButton(title: String, onClick: () -> Unit) {
+fun ProfileButton(title: String, bgColor: Color, textColor: Color, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
-        shape = RoundedCornerShape(6.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+        shape = RoundedCornerShape(12.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = bgColor)
     ) {
-        Text(title, color = Color.Black)
+        Text(title, color = textColor)
     }
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(12.dp))
 }
 
 @Preview(showBackground = true)

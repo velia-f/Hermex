@@ -1,31 +1,23 @@
 package com.example.hermex
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,123 +29,139 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun ServiceDetailScreen(navController: NavController) {
     val scrollState = rememberScrollState()
-    /*Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }
-    ) { paddingValues ->*/
-        Column(
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+            .padding(16.dp)
+    ) {
+        // Image
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(16.dp)
-        ) {
-            // Img placeholder
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(Color.LightGray, RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(stringResource(R.string.image))
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // titolo
-            Text(
-                text = stringResource(R.string.service_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Descrizione
-            Text(
-                text = stringResource(R.string.lorem_ipsum),
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Autoru e stelle
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    stringResource(R.string.author_name),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    repeat(3) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = Color.Gray
-                        )
-                    }
-                    Icon(
-                        imageVector = Icons.Default.Star,
-                        contentDescription = null,
-                        tint = Color.Black
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    brush = Brush.linearGradient(
+                        listOf(Color(0xFF6A11CB), Color(0xFF2575FC))
                     )
-                    Text(stringResource(R.string._4_0), style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // contatta e compra pulsanti
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                OutlinedButton(onClick = {
-                    // TODO: Azione acquisto
-                }) {
-                    Text(stringResource(R.string.buy))
-                }
-
-                OutlinedButton(onClick = {
-                    // TODO: Azione contatto
-                }) {
-                    Text(stringResource(R.string.contact))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Sezione "simili"
+                ),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
-                stringResource(R.string.similar),
+                text = stringResource(R.string.image),
+                color = Color.White,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
+        Text(
+            text = stringResource(R.string.service_title),
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.lorem_ipsum),
+            style = MaterialTheme.typography.bodyLarge,
+            color = Color.Gray
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                stringResource(R.string.author_name),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 repeat(4) {
-                    Box(
-                        modifier = Modifier
-                            .size(80.dp)
-                            .background(Color.LightGray, RoundedCornerShape(6.dp))
-                            .clickable {
-                                // TODO: Azione su servizio simile
-                            }
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFFC107)
                     )
+                }
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color.LightGray
+                )
+                Text("4.0", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 4.dp))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Button(
+                onClick = { /* TODO: Compra */ },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF2575FC),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(text = stringResource(R.string.buy))
+            }
+
+            OutlinedButton(
+                onClick = { /* TODO: Contatta */ },
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = Color(0xFF2575FC)
+                ),
+                border = BorderStroke(1.dp, Color(0xFF2575FC))
+            ) {
+                Text(text = stringResource(R.string.contact))
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            stringResource(R.string.similar),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            repeat(4) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .shadow(4.dp, RoundedCornerShape(12.dp))
+                        .background(Color.White, RoundedCornerShape(12.dp))
+                        .clickable { /* TODO */ },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("Servizio ${it + 1}", color = Color(0xFF2575FC), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
-   // }
+    }
 }
 
 @Preview(showBackground = true)

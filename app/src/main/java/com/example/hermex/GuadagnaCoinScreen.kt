@@ -38,76 +38,74 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun GuadagnaCoinScreen(navController: NavController) {
     val scrollState = rememberScrollState()
-    /*Scaffold(
-        bottomBar = { BottomNavBar(navController = navController) }
-    ) { paddingValues ->*/
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+    ) {
+        // Barra in alto
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .background(Color(0xFF979D9C))
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.guadagna_coin),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.MonetizationOn,
+                    contentDescription = null,
+                    tint = Color.Yellow
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "10",
+                    color = Color.White,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        // Contenuto scrollabile
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
                 .padding(16.dp)
+                .verticalScroll(scrollState)
         ) {
-            // Top bar non va
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.guadagna_coin),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.MonetizationOn,
-                        contentDescription = null,
-                        tint = Color.Black
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "10")
-                }
-            }
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Card: Guarda Ads
-            ActionCard(
+            // Sezione Cards
+            ActionCardStyled(
                 icon = Icons.Default.PlayArrow,
                 title = stringResource(R.string.guarda_ads),
                 subtitle = stringResource(R.string.guadagna_coin),
-                onClick = {
-                    // TODO: Guarda un video pubblicitario
-                }
+                onClick = { /* TODO */ }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Card: Acquista Coin
-            ActionCard(
+            ActionCardStyled(
                 icon = Icons.Default.ShoppingCart,
                 title = stringResource(R.string.acquista_coin),
                 subtitle = stringResource(R.string._1_coin_per_0_5_3_coin_per_1),
-                onClick = {
-                    // TODO: Apri schermata di acquisto
-                }
+                onClick = { /* TODO */ }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Card: Riscatta Certificato
-            ActionCard(
+            ActionCardStyled(
                 icon = Icons.Default.Receipt,
                 title = stringResource(R.string.riscatta_il_tuo_certificato),
                 subtitle = stringResource(R.string.pagamento),
-                onClick = {
-                    // TODO: Riscatta certificato
-                }
+                onClick = { /* TODO */ }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Card: Inserisci Annuncio
-            ActionCard(
+            ActionCardStyled(
                 icon = Icons.Default.Add,
                 title = stringResource(R.string.inserisci_annuncio_vendita_servizio),
                 subtitle = null,
@@ -116,23 +114,20 @@ fun GuadagnaCoinScreen(navController: NavController) {
                 }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Referral Code
-            ActionCard(
+            ActionCardStyled(
                 icon = Icons.Default.Share,
                 title = stringResource(R.string.referral_code),
                 subtitle = stringResource(R.string.condividendo_il_tuo_codice_si_guadagnano_dei_coin),
-                onClick = {
-                    // TODO: Condividi referral
-                }
+                onClick = { /* TODO */ }
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
         }
-  //  }
+    }
 }
 
 @Composable
-fun ActionCard(
+fun ActionCardStyled(
     icon: ImageVector?,
     title: String,
     subtitle: String?,
@@ -141,34 +136,43 @@ fun ActionCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight()
+            .padding(vertical = 6.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(8.dp),
-        border = BorderStroke(1.dp, Color.Black)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF7F7F7))
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier.size(38.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(Color(0xFF2575FC), shape = RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = icon,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
             }
             Column {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.titleMedium
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp
                 )
                 if (!subtitle.isNullOrEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = subtitle,
-                        style = MaterialTheme.typography.bodySmall
+                        fontSize = 14.sp,
+                        color = Color.Gray
                     )
                 }
             }
