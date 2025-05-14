@@ -35,9 +35,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+
+
 @Composable
 fun ProfileScreen(navController: NavController) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+
+    // Stato per salvare la URI della foto scelta
+    val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+
+    // Launcher per aprire la galleria
+    val imagePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri.value = uri
+    }
+
+    //forse non verrà aggiornato e serve un remeber o metterlo dentro dove viene chiamato
+    val inputStream = selectedImageUri.value?.let {
+        context.contentResolver.openInputStream(it)
+    }
 
     Column(
         modifier = Modifier
@@ -68,16 +92,29 @@ fun ProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Profile picture placeholder
+        // Profile picture
         Box(
             modifier = Modifier
                 .size(140.dp)
                 .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(100.dp))
                 .align(Alignment.CenterHorizontally)
-                .border(2.dp, Color.Black, RoundedCornerShape(100.dp)),
+                .border(2.dp, Color.Black, RoundedCornerShape(100.dp))
+                .clickable {
+                    imagePickerLauncher.launch("image/*")
+                },
             contentAlignment = Alignment.Center
         ) {
-            Text("👤", fontSize = 48.sp)
+            if (selectedImageUri.value != null) {
+                AsyncImage(
+                    model = selectedImageUri.value,
+                    contentDescription = "Selected profile picture",
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(RoundedCornerShape(100.dp))
+                )
+            } else {
+                Text("👤", fontSize = 48.sp)
+            }
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -86,7 +123,9 @@ fun ProfileScreen(navController: NavController) {
             text = stringResource(R.string.change_background),
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .clickable { /* TODO */ }
+                .clickable {
+                    imagePickerLauncher.launch("image/*")
+                }
                 .padding(4.dp),
             color = Color(0xFF1E88E5),
             style = MaterialTheme.typography.bodyMedium
