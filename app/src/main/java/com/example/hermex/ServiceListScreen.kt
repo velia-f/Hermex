@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -80,18 +81,19 @@ fun ServiceListScreen(navController: NavController) {
 
         // Lista servizi
         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(5) {
-                Spacer(modifier = Modifier.height(10.dp))
-                ServiceItem(onClick = {
-                    navController.navigate(Screen.ServiceDetail.route)
+            items(FakeServiceRepository.services) { service ->
+                ServiceItem(service = service, onClick = {
+                    navController.navigate("service_detail/${service.id}")
                 })
             }
         }
+        Spacer(modifier = Modifier.width(16.dp))
     }
 }
 
 @Composable
-fun ServiceItem(onClick: () -> Unit) {
+//funz di prima senza in serviceID
+fun SServiceItem(onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .clickable { onClick() }
@@ -147,6 +149,74 @@ fun ServiceItem(onClick: () -> Unit) {
         }
     }
 }
+
+@Composable
+fun ServiceItem(service: Service, onClick: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .clickable { onClick() }
+            .fillMaxWidth()
+            .shadow(6.dp, RoundedCornerShape(16.dp))
+            .background(Color.White, RoundedCornerShape(16.dp))
+            .padding(16.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                modifier = Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFB3E5FC))
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(service.title, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text(service.description, fontSize = 12.sp, color = Color.Gray)
+                Text(service.author, fontSize = 12.sp, color = Color.DarkGray)
+                //Text("${service.rating}", fontSize = 12.sp, color = Color.Gray)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val fullStars = service.rating.toInt()
+                    val hasHalfStar = (service.rating - fullStars) >= 0.5
+
+                    repeat(fullStars) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Stella piena",
+                            tint = Color(0xFFFFC107)
+                        )
+                    }
+
+                    if (hasHalfStar) {
+                        Icon(
+                            imageVector = Icons.Default.StarHalf,
+                            contentDescription = "Mezza stella",
+                            tint = Color(0xFFFFC107)
+                        )
+                    }
+
+                    val remainingStars = 5 - fullStars - if (hasHalfStar) 1 else 0
+                    repeat(remainingStars) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = "Stella vuota",
+                            tint = Color.LightGray
+                        )
+                    }
+
+                    Text(
+                        text = "${service.rating}",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = 4.dp),
+                        color = Color.Gray,
+                        fontSize = 12.sp
+                    )
+                }
+
+            }
+        }
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable

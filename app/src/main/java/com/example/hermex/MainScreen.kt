@@ -16,20 +16,7 @@ fun MainScreen() {
     Scaffold(
         bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(Screen.Home.route) { ServiceListScreen(navController) }
-            composable(Screen.Add.route) { VenditaServizioScreen(navController) }
-            composable(Screen.Earn.route) { GuadagnaCoinScreen(navController) }
-            composable(Screen.Profile.route) { ProfileScreen(navController) }
-            composable(Screen.ServiceDetail.route) { ServiceDetailScreen(navController) }
-            composable(Screen.Login.route) { LoginScreen(navController) }
-            composable(Screen.RegisterScreen.route) { RegisterScreen(navController) }
-
-        }
+        NavGraph(navController = navController, modifier = Modifier.padding(innerPadding))
     }
 }
 

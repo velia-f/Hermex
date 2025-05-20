@@ -3,6 +3,7 @@ package com.example.hermex
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
@@ -100,8 +102,13 @@ fun ContactButton(email: String) {
 
 
 @Composable
-fun ServiceDetailScreen(navController: NavController) {
+fun ServiceDetailScreen(serviceId: Int, navController: NavController) {
     val scrollState = rememberScrollState()
+    val service = FakeServiceRepository.getById(serviceId)
+    if (service == null) {
+        Text("Servizio non trovato")
+        return
+    }
 
     Column(
         modifier = Modifier
@@ -133,7 +140,8 @@ fun ServiceDetailScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = stringResource(R.string.service_title),
+            //text = stringResource(R.string.service_title),
+            text = service.title,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold
         )
@@ -141,7 +149,8 @@ fun ServiceDetailScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = stringResource(R.string.lorem_ipsum),
+            //text = stringResource(R.string.lorem_ipsum),
+            text = service.description,
             style = MaterialTheme.typography.bodyLarge,
             color = Color.Gray
         )
@@ -154,26 +163,50 @@ fun ServiceDetailScreen(navController: NavController) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                stringResource(R.string.author_name),
+                //stringResource(R.string.author_name),
+                text = "${service.author}",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                repeat(4) {
+                val fullStars = service.rating.toInt()
+                val hasHalfStar = (service.rating - fullStars) >= 0.5
+
+                repeat(fullStars) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = null,
+                        contentDescription = "Stella piena",
                         tint = Color(0xFFFFC107)
                     )
                 }
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    tint = Color.LightGray
+
+                if (hasHalfStar) {
+                    Icon(
+                        imageVector = Icons.Default.StarHalf,
+                        contentDescription = "Mezza stella",
+                        tint = Color(0xFFFFC107)
+                    )
+                }
+
+                val remainingStars = 5 - fullStars - if (hasHalfStar) 1 else 0
+                repeat(remainingStars) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = "Stella vuota",
+                        tint = Color.LightGray
+                    )
+                }
+
+                Text(
+                    text = "${service.rating}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 4.dp),
+                    color = Color.Gray,
+                    fontSize = 12.sp
                 )
-                Text("4.0", style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 4.dp))
             }
+
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -193,7 +226,7 @@ fun ServiceDetailScreen(navController: NavController) {
                 Text(text = stringResource(R.string.buy))
             }
 
-            ContactButton(email = "example@example.com")
+            ContactButton(email = "info@hermex.com")
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -213,6 +246,34 @@ fun ServiceDetailScreen(navController: NavController) {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             repeat(4) {
+                val serviceId = it + 1
+                val currentService = FakeServiceRepository.getById(serviceId)
+
+                if (currentService != null) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .size(100.dp)
+                            .shadow(4.dp, RoundedCornerShape(12.dp))
+                            .background(Color.White, RoundedCornerShape(12.dp)),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFF2575FC)
+                        ),
+                        border = BorderStroke(1.dp, Color(0xFF2575FC)),
+                        onClick = {
+                            navController.navigate(Screen.ServiceDetail.createRoute(serviceId))
+                        }
+                    ) {
+                        Text(
+                            text = currentService.title,
+                            color = Color(0xFF2575FC),
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
+                }
+            }
+
+            /*repeat(4) {
                 OutlinedButton(
                     modifier = Modifier
                         .size(100.dp)
@@ -225,15 +286,18 @@ fun ServiceDetailScreen(navController: NavController) {
                     ),
                     border = BorderStroke(1.dp, Color(0xFF2575FC)),
                     onClick = {
-                        navController.navigate(Screen.ServiceDetail.route)//da modificare tale per cui vada nella pagina con idpost giusto
+                        //navController.navigate(Screen.ServiceDetail.route)//da modificare tale per cui vada nella pagina con idpost giusto
+                        // TODO: migliorare logica (sotto)
+                        navController.navigate(Screen.ServiceDetail.createRoute(serviceId = it + 1))
                     },
                 ) {
                     Text(
-                        "Servizio ${it + 1}",
-                        color = Color(0xFF2575FC)
+                        text = FakeServiceRepository.getById(serviceId)?.title ?: "null",
+                        color = Color(0xFF2575FC),
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
-            }
+            }*/
         }
     }
 }
@@ -241,5 +305,5 @@ fun ServiceDetailScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun ServiceDetailPreview() {
-    ServiceDetailScreen(navController = rememberNavController())
+    ServiceDetailScreen(serviceId = 1, navController = rememberNavController())
 }
