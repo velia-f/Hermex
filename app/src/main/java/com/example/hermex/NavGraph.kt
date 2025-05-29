@@ -23,7 +23,7 @@ fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
         composable(Screen.Add.route) { VenditaServizioScreen(navController) }
         composable(Screen.Earn.route) { GuadagnaCoinScreen(navController) }
         composable(Screen.Profile.route) { ProfileScreen(navController) }
-        //composable(Screen.ServiceDetail.route) { ServiceDetailScreen(navController) }
+
         composable(
             route = "service_detail/{serviceId}",
             arguments = listOf(navArgument("serviceId") { type = NavType.IntType })
@@ -31,6 +31,14 @@ fun NavGraph(navController: NavHostController, modifier: Modifier = Modifier) {
             val serviceId = backStackEntry.arguments?.getInt("serviceId") ?: -1
             ServiceDetailScreen(serviceId = serviceId, navController = navController)
         }
+        composable(
+            "modifica_servizio/{serviceId}",
+            arguments = listOf(navArgument("serviceId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val serviceId = backStackEntry.arguments?.getInt("serviceId") ?: 0
+            ModificaServizioScreen(serviceId = serviceId, navController = navController)
+        }
+
         composable(Screen.Login.route) { LoginScreen(navController) }
         composable(Screen.RegisterScreen.route) { RegisterScreen(navController) }
     }

@@ -29,9 +29,10 @@
     <string name="back">Indietro</string>
     <string name="profile">Profilo</string>
     <string name="change_background">Cambia Profilo</string>
-    <string name="display_name">Username pubblico</string>
-    <string name="email">Email</string>
-    <string name="password">Password</string>
+    <string name="display_name">TrentaELode</string>
+    <string name="email">prova@gmail.com</string>
+    <string name="password">**********</string>
+    <string name="passwordlog">Password</string>
     <string name="log_out">Esci</string>
     <string name="delete_profile">Cancella profilo</string>
     <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit, s\ne l do eiusmod...</string>

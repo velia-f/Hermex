@@ -7,7 +7,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -30,18 +28,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.Header
-import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import java.io.InputStream
 
 @Composable
-fun VenditaServizioScreen(navController: NavController) {
+fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
     val titolo = remember { mutableStateOf("") }
     val descrizione = remember { mutableStateOf("") }
     val prezzo = remember { mutableStateOf("") }
     val localizzazione = remember { mutableStateOf("") }
     val immagine = remember { mutableStateOf<Uri?>(null) }
+    val immagineUrl = remember { mutableStateOf("") }
 
     val showErrors = remember { mutableStateOf(false) }
+    val isLoading = remember { mutableStateOf(true) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -49,11 +50,42 @@ fun VenditaServizioScreen(navController: NavController) {
         immagine.value = uri
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(serviceId) {
         val token = getToken(context)
         if (token == null) {
             navController.navigate("login")
+            return@LaunchedEffect
         }
+
+        try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("http://10.0.2.2:3000/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val api = retrofit.create(InternalServiceApi::class.java)
+            val service = api.getService(serviceId, "Bearer $token")
+
+            titolo.value = service.nome_servizio
+            descrizione.value = service.descrizione_servizio
+            prezzo.value = service.prezzo.toString()
+            immagineUrl.value = service.immagine_servizio
+
+            isLoading.value = false
+        } catch (e: Exception) {
+            Toast.makeText(context, "Errore nel caricamento", Toast.LENGTH_SHORT).show()
+            navController.popBackStack()
+        }
+    }
+
+    if (isLoading.value) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF2575FC))
+        }
+        return
     }
 
     Column(
@@ -67,15 +99,8 @@ fun VenditaServizioScreen(navController: NavController) {
                 .height(56.dp)
                 .background(Color(0xFF2575FC)),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.End
         ) {
-            Text(
-                text = stringResource(R.string.vendita_servizio),
-                modifier = Modifier.padding(start = 16.dp),
-                style = MaterialTheme.typography.titleLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
             Button(
                 onClick = {
                     showErrors.value = true
@@ -83,8 +108,7 @@ fun VenditaServizioScreen(navController: NavController) {
                     val isValid = titolo.value.isNotBlank() &&
                             descrizione.value.isNotBlank() &&
                             prezzo.value.isNotBlank() &&
-                            localizzazione.value.isNotBlank() &&
-                            immagine.value != null
+                            localizzazione.value.isNotBlank()
 
                     if (!isValid) {
                         Toast.makeText(context, "Compila tutti i campi obbligatori", Toast.LENGTH_SHORT).show()
@@ -97,30 +121,30 @@ fun VenditaServizioScreen(navController: NavController) {
                         return@Button
                     }
 
-                    val input: InputStream? = context.contentResolver.openInputStream(immagine.value!!)
-                    val bytes = input?.readBytes()
-                    input?.close()
-                    val base64Image = if (bytes != null) {
-                        "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP)
-                    } else null
-
-                    if (base64Image == null) {
-                        Toast.makeText(context, "Errore nell'immagine", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-
                     val retrofit = Retrofit.Builder()
                         .baseUrl("http://10.0.2.2:3000/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
 
-                    val servizioApi = retrofit.create(ServizioApi::class.java)
+                    val servizioApi = retrofit.create(ModificaServizioApi::class.java)
 
                     scope.launch {
                         try {
-                            val response = servizioApi.creaServizio(
+                            var base64Image: String? = null
+
+                            immagine.value?.let { uri ->
+                                val input: InputStream? = context.contentResolver.openInputStream(uri)
+                                val bytes = input?.readBytes()
+                                input?.close()
+                                base64Image = if (bytes != null) {
+                                    "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP)
+                                } else null
+                            }
+
+                            val response = servizioApi.modificaServizio(
+                                serviceId,
                                 "Bearer $token",
-                                CreaServizioRequest(
+                                ModificaServizioRequest(
                                     nome_servizio = titolo.value,
                                     descrizione_servizio = descrizione.value,
                                     prezzo = prezzo.value.toDouble(),
@@ -129,17 +153,51 @@ fun VenditaServizioScreen(navController: NavController) {
                                 )
                             )
                             Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show()
-                            navController.navigate("home")
+                            navController.popBackStack()
                         } catch (e: Exception) {
-                            Toast.makeText(context, "Errore salvataggio", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Errore aggiornamento", Toast.LENGTH_SHORT).show()
                         }
                     }
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                 shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.padding(end = 16.dp)
+                modifier = Modifier.padding(end = 8.dp)
             ) {
                 Text("Salva", color = Color(0xFF2575FC), fontWeight = FontWeight.Bold)
+            }
+
+            Button(
+                onClick = {
+                    val token = getToken(context)
+                    if (token == null) {
+                        navController.navigate("login")
+                        return@Button
+                    }
+
+                    val retrofit = Retrofit.Builder()
+                        .baseUrl("http://10.0.2.2:3000/")
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build()
+
+                    val eliminaApi = retrofit.create(EliminaServizioApi::class.java)
+
+                    scope.launch {
+                        try {
+                            eliminaApi.eliminaServizio(serviceId, "Bearer $token")
+                            Toast.makeText(context, "Servizio eliminato", Toast.LENGTH_SHORT).show()
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) { inclusive = true }
+                            }
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Errore eliminazione", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.padding(end = 16.dp)
+            ) {
+                Text("Elimina", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -157,9 +215,18 @@ fun VenditaServizioScreen(navController: NavController) {
 
             Text("Immagine", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
             Row(modifier = Modifier.padding(vertical = 8.dp)) {
-                immagine.value?.let {
+                if (immagine.value != null) {
                     AsyncImage(
-                        model = it,
+                        model = immagine.value,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(2.dp, Color(0xFF2575FC), RoundedCornerShape(16.dp))
+                    )
+                } else if (immagineUrl.value.isNotEmpty()) {
+                    AsyncImage(
+                        model = immagineUrl.value,
                         contentDescription = null,
                         modifier = Modifier
                             .size(120.dp)
@@ -167,6 +234,7 @@ fun VenditaServizioScreen(navController: NavController) {
                             .border(2.dp, Color(0xFF2575FC), RoundedCornerShape(16.dp))
                     )
                 }
+
                 Spacer(modifier = Modifier.width(12.dp))
                 Box(
                     modifier = Modifier
@@ -216,22 +284,27 @@ fun VenditaServizioScreen(navController: NavController) {
     }
 }
 
-// DATA E API
-
-data class CreaServizioRequest(
+data class ModificaServizioRequest(
     val nome_servizio: String,
     val descrizione_servizio: String,
     val prezzo: Double,
     val localizzazione: String,
-    val immagine: String
+    val immagine: String?
 )
 
-//data class MessageResponse(val message: String)
-
-interface ServizioApi {
-    @POST("api/servizi")
-    suspend fun creaServizio(
+interface ModificaServizioApi {
+    @PUT("api/servizio/{id}")
+    suspend fun modificaServizio(
+        @Path("id") id: Int,
         @Header("Authorization") token: String,
-        @Body body: CreaServizioRequest
+        @Body body: ModificaServizioRequest
+    ): MessageResponse
+}
+
+interface EliminaServizioApi {
+    @PUT("api/servizio/{id}/elimina")
+    suspend fun eliminaServizio(
+        @Path("id") id: Int,
+        @Header("Authorization") token: String
     ): MessageResponse
 }

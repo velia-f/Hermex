@@ -13,12 +13,14 @@ import androidx.navigation.compose.rememberNavController
 fun MainScreen() {
     val navController = rememberNavController()
 
+
     Scaffold(
         bottomBar = { BottomNavBar(navController) }
     ) { innerPadding ->
         NavGraph(navController = navController, modifier = Modifier.padding(innerPadding))
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

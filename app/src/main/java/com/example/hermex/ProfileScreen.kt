@@ -1,67 +1,96 @@
 package com.example.hermex
 
+import android.content.Context
+import com.example.hermex.TokenManager.getToken
+import com.example.hermex.TokenManager.clearToken
+import android.content.SharedPreferences
+import android.net.Uri
+import android.util.Base64
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.PUT
+import java.io.InputStream
 
 
+// TokenManager locale
+fun saveToken(context: Context, token: String) {
+    val prefs: SharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    prefs.edit().putString("token", token).apply()
+}
+
+suspend fun getToken(context: Context): String? {
+    return context.getSharedPreferences("auth", Context.MODE_PRIVATE).getString("token", null)
+}
+
+fun clearToken(context: Context) {
+    val prefs: SharedPreferences = context.getSharedPreferences("auth", Context.MODE_PRIVATE)
+    prefs.edit().remove("token").apply()
+}
+
+// UI
 @Composable
 fun ProfileScreen(navController: NavController) {
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
-    // Stato per salvare la URI della foto scelta
+    var username by remember { mutableStateOf(TextFieldValue("")) }
+    var email by remember { mutableStateOf(TextFieldValue("")) }
+    var imageUrl by remember { mutableStateOf("") }
     val selectedImageUri = remember { mutableStateOf<Uri?>(null) }
+    var isEditable by remember { mutableStateOf(false) }
 
-    // Launcher per aprire la galleria
-    val imagePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
+    val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         selectedImageUri.value = uri
     }
 
-    //forse non verrà aggiornato e serve un remeber o metterlo dentro dove viene chiamato
-    val inputStream = selectedImageUri.value?.let {
-        context.contentResolver.openInputStream(it)
+    LaunchedEffect(true) {
+        val token = getToken(context)
+        Log.d("TOKEN_DEBUG", "Token ottenuto: ${token ?: "NULL"}")
+
+        if (token == null) {
+            navController.navigate("login")
+            return@LaunchedEffect
+        }
+
+        try {
+            val user = provideUserApi().getUserData("Bearer $token")
+            username = TextFieldValue(user.username)
+            email = TextFieldValue(user.email)
+            imageUrl = user.profileImageUrl
+        } catch (e: Exception) {
+            Toast.makeText(context, "Errore nel caricamento", Toast.LENGTH_SHORT).show()
+        }
     }
+
 
     Column(
         modifier = Modifier
@@ -69,45 +98,34 @@ fun ProfileScreen(navController: NavController) {
             .verticalScroll(scrollState)
             .padding(16.dp)
     ) {
-        // Top bar
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            Text("Profilo", fontSize = 24.sp)
             Text(
-                text = stringResource(R.string.profile),
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
-            )
-
-            Text(
-                text = stringResource(R.string.edit),
+                if (isEditable) "Annulla" else "Modifica",
                 color = Color(0xFF1E88E5),
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .clickable { /* TODO */ }
-                    .padding(8.dp)
+                modifier = Modifier.clickable { isEditable = !isEditable }
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        // Profile picture
         Box(
             modifier = Modifier
                 .size(140.dp)
-                .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(100.dp))
                 .align(Alignment.CenterHorizontally)
-                .border(2.dp, Color.Black, RoundedCornerShape(100.dp))
-                .clickable {
-                    imagePickerLauncher.launch("image/*")
-                },
+                .border(2.dp, Color.Gray, RoundedCornerShape(100.dp))
+                .clickable(enabled = isEditable) { imagePickerLauncher.launch("image/*") },
             contentAlignment = Alignment.Center
         ) {
-            if (selectedImageUri.value != null) {
+            val imageToShow = selectedImageUri.value ?: imageUrl.takeIf { it.isNotEmpty() }
+            if (imageToShow != null) {
                 AsyncImage(
-                    model = selectedImageUri.value,
-                    contentDescription = "Selected profile picture",
+                    model = imageToShow,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(140.dp)
                         .clip(RoundedCornerShape(100.dp))
@@ -117,80 +135,87 @@ fun ProfileScreen(navController: NavController) {
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-
-        Text(
-            text = stringResource(R.string.change_background),
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .clickable {
-                    imagePickerLauncher.launch("image/*")
-                }
-                .padding(4.dp),
-            color = Color(0xFF1E88E5),
-            style = MaterialTheme.typography.bodyMedium
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Fields
-        ProfileTextField(title = stringResource(R.string.display_name))
-        ProfileTextField(title = stringResource(R.string.email))
-        ProfileTextField(title = stringResource(R.string.password))
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            enabled = isEditable,
+            placeholder = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            enabled = isEditable,
+            placeholder = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (isEditable) {
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = {
+                    scope.launch {
+                        val token = getToken(context.applicationContext)
+                        var imageBase64: String? = null
+
+                        selectedImageUri.value?.let { uri ->
+                            val input: InputStream? = context.contentResolver.openInputStream(uri)
+                            val bytes = input?.readBytes()
+                            input?.close()
+                            if (bytes != null) {
+                                imageBase64 = "data:image/jpeg;base64," + Base64.encodeToString(bytes, Base64.NO_WRAP)
+                            }
+                        }
+
+                        try {
+                            val response = provideUserApi().updateProfile(
+                                "Bearer $token",
+                                UpdateProfileRequest(username.text, email.text, imageBase64)
+                            )
+                            Toast.makeText(context, response.message, Toast.LENGTH_SHORT).show()
+                            isEditable = false
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Errore aggiornamento", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+            ) {
+                Text("Salva", color = Color.White)
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = {
+                scope.launch {
+                    clearToken(context)
+                    navController.navigate("login")
+                }
+            },
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+        ) {
+            Text("Esci", color = Color.Black)
+        }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Action buttons
-        ProfileButton(
-            title = stringResource(R.string.log_out),
-            bgColor = Color(0xFFEEEEEE),
-            textColor = Color.Black
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(12.dp))
+                .padding(16.dp)
         ) {
-            navController.navigate(Screen.Login.route)
-        }
-
-        ProfileButton(
-            title = stringResource(R.string.delete_profile),
-            bgColor = Color(0xFFEF5350),
-            textColor = Color.White
-        ) {
-            // TODO: Cancella profilo
+            Text("📦 Spazio riservato ai tuoi servizi")
         }
     }
-}
-
-@Composable
-fun ProfileTextField(title: String) {
-    val text = remember { mutableStateOf("") }
-    OutlinedTextField(
-        value = text.value,
-        onValueChange = { text.value = it },
-        placeholder = { Text(title) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 6.dp),
-        shape = RoundedCornerShape(12.dp),
-        singleLine = true
-    )
-}
-
-@Composable
-fun ProfileButton(title: String, bgColor: Color, textColor: Color, onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
-        shape = RoundedCornerShape(12.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = bgColor)
-    ) {
-        Text(title, color = textColor)
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ProfileScreenPreview() {
-    ProfileScreen(navController = rememberNavController())
 }

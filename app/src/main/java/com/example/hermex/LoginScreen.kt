@@ -1,10 +1,10 @@
 package com.example.hermex
 
+import android.content.Context
 import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -20,104 +20,97 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.hermex.TokenManager.saveToken
+import kotlinx.coroutines.launch
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.Response
+
+// Retrofit API
+data class LoginRequest(val email: String, val password: String)
+data class User(val id: Int, val nome: String, val cognome: String, val email: String, val immagine: String?)
+data class LoginResponse(val message: String, val token: String, val utente: User)
+
+interface LoginApiService {
+    @POST("/login")
+    suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
+}
+
+fun provideLoginApi(): LoginApiService {
+    return Retrofit.Builder()
+        .baseUrl("http://10.0.2.2:3000/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+        .create(LoginApiService::class.java)
+}
+
 @Composable
 fun LoginScreen(navController: NavController) {
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 48.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "Accedi al tuo account",
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
+        Text("Accedi", style = MaterialTheme.typography.titleLarge)
 
-        // Email
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
             placeholder = { Text("Email") },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = "Email"
-                )
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            leadingIcon = { Icon(Icons.Default.Person, contentDescription = null) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp)
+                .padding(vertical = 8.dp)
         )
 
-        // Password
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            placeholder = { Text(stringResource(R.string.password)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Lock,
-                    contentDescription = stringResource(R.string.password)
-                )
-            },
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
+            placeholder = { Text("Password") },
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             visualTransformation = PasswordVisualTransformation(),
-            singleLine = true,
-            shape = RoundedCornerShape(12.dp),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 32.dp)
+                .padding(vertical = 8.dp)
         )
 
-        // Accedi
         Button(
             onClick = {
-                if (email.text.isEmpty() || password.text.isEmpty()) {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.per_favore_inserisci_email_e_password),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.login_effettuato_con_successo),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    navController.navigate(Screen.Home.route)
+                scope.launch {
+                    val response = provideLoginApi().login(LoginRequest(email.text, password.text))
+                    if (response.isSuccessful) {
+                        val token = response.body()?.token ?: return@launch
+                        saveToken(context.applicationContext, token)
+                        Log.d("TOKEN_SALVATO", token)
+                        Toast.makeText(context, "Login effettuato", Toast.LENGTH_SHORT).show()
+                        navController.navigate("profile")
+                    } else {
+                        Toast.makeText(context, "Credenziali errate", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E88E5))
+                .padding(vertical = 8.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Text(text = stringResource(R.string.accedi), color = Color.White)
+            Text("Accedi")
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Crea profilo
-        Button(
+        OutlinedButton(
             onClick = {
                 navController.navigate(Screen.RegisterScreen.route)
             },
@@ -132,9 +125,8 @@ fun LoginScreen(navController: NavController) {
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
-fun LoginScreenPreview() {
+fun PreviewLoginScreen() {
     LoginScreen(navController = rememberNavController())
 }
