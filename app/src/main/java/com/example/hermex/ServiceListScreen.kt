@@ -143,6 +143,7 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text("Autore: ${service.autore}", fontSize = 12.sp, color = Color.DarkGray)
+
                 Text("Prezzo: €${"%.2f".format(service.prezzo)}", fontSize = 12.sp, color = Color.Black)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
