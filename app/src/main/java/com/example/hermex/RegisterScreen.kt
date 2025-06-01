@@ -218,9 +218,12 @@ fun RegisterScreen(navController: NavController) {
                                 val response = client.newCall(request).execute()
                                 val responseBody = response.body?.string()
                                 Handler(Looper.getMainLooper()).post {
+
                                     if (response.isSuccessful) {
                                         Toast.makeText(context, "Registrazione completata!", Toast.LENGTH_SHORT).show()
-                                        navController.navigate("LoginScreen")
+                                        navController.navigate("login") {
+                                            popUpTo("register") { inclusive = true } // pulizia dello stack
+                                        }
                                     } else {
                                         Toast.makeText(context, "Errore: $responseBody", Toast.LENGTH_LONG).show()
                                     }

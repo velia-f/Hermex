@@ -24,7 +24,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.hermex.TokenManager.getToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -172,27 +176,68 @@ fun ServiceDetailScreen(serviceId: Int, navController: NavController) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Button(
-                    onClick = { /* Compra */ },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2575FC), contentColor = Color.White)
-                ) {
-                    Text("Compra • ${String.format("%.2f", s.prezzo)}€")
-                }
+                if (!isAutore) {
+                    Button(
+                        onClick = {
+                            CoroutineScope(Dispatchers.IO).launch {
+                                try {
+                                    val client = okhttp3.OkHttpClient()
 
-                OutlinedButton(
-                    onClick = {
-                        val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
-                            data = Uri.parse("mailto:info@hermex.com")
+                                    val json = """
+                {
+                    "id_servizio": ${s.id_servizio}
+                }
+            """.trimIndent()
+
+                                    val body = okhttp3.RequestBody.create("application/json".toMediaTypeOrNull(), json)
+                                    val request = okhttp3.Request.Builder()
+                                        .url("http://10.0.2.2:3000/api/servizio/acquista")
+                                        .addHeader("Authorization", "Bearer $token")
+                                        .post(body)
+                                        .build()
+
+                                    val response = client.newCall(request).execute()
+                                    val responseBody = response.body?.string()
+
+                                    withContext(Dispatchers.Main) {
+                                        if (response.isSuccessful) {
+                                            Toast.makeText(context, "Acquisto completato!", Toast.LENGTH_SHORT).show()
+                                            navController.navigate("profile") // O un'altra schermata post-acquisto
+                                        } else {
+                                            Toast.makeText(context, "Errore: $responseBody", Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, "Errore durante l'acquisto", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
                         }
-                        context.startActivity(emailIntent)
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, Color(0xFF2575FC))
-                ) {
-                    Text("Contatta", color = Color(0xFF2575FC))
+                        ,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF2575FC),
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text("Compra • ${String.format("%.2f", s.prezzo)}")
+                    }
                 }
-
+                if (!isAutore) {
+                    OutlinedButton(
+                        onClick = {
+                            val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:info@hermex.com")
+                            }
+                            context.startActivity(emailIntent)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        border = BorderStroke(1.dp, Color(0xFF2575FC))
+                    ) {
+                        Text("Contatta", color = Color(0xFF2575FC))
+                    }
+                }
                 if (isAutore) {
                     OutlinedButton(
                         onClick = {
@@ -250,7 +295,7 @@ fun ServiceDetailScreen(serviceId: Int, navController: NavController) {
                                     color = Color.Gray
                                 )
                                 Text(
-                                    text = "€ ${String.format("%.2f", item.prezzo)}",
+                                    text = "${String.format("%.2f", item.prezzo)}",
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = Color(0xFF2575FC),
                                     fontWeight = FontWeight.Medium

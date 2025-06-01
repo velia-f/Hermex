@@ -1,55 +1,72 @@
 package com.example.hermex
 
 import android.content.Intent
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.text.input.KeyboardType
-
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Circle
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.*
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.*
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.text.TextStyle
-import com.example.hermex.ui.theme.HermexTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.*
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import com.example.hermex.TokenManager.getToken
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.GET
+import retrofit2.http.Header
+
+// API INTERFACE
+interface SaldoApi {
+    @GET("api/user/saldo")
+    suspend fun getSaldo(@Header("Authorization") token: String): SaldoResponse
+}
+
+data class SaldoResponse(val saldo: Double)
 
 @Composable
 fun GuadagnaCoinScreen(navController: NavController) {
-    val scrollState = rememberScrollState()
     val context = LocalContext.current
+    val scrollState = rememberScrollState()
     val openDialog = remember { mutableStateOf(false) }
     val dialogTitle = remember { mutableStateOf("") }
+
+    var saldo by remember { mutableStateOf(0.0) }
+
+    // Recupero saldo dal backend
+    LaunchedEffect(Unit) {
+        try {
+            val token = getToken(context)
+            if (token != null) {
+                val retrofit = Retrofit.Builder()
+                    .baseUrl("http://10.0.2.2:3000/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build()
+                val api = retrofit.create(SaldoApi::class.java)
+                val response = api.getSaldo("Bearer $token")
+                saldo = response.saldo
+                Log.d("SALDO_DEBUG", "Saldo attuale: $saldo")
+            }
+        } catch (e: Exception) {
+            Log.e("SALDO_ERROR", "Errore nel recupero saldo", e)
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // Barra in alto
+        // TOP BAR con saldo
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,14 +90,14 @@ fun GuadagnaCoinScreen(navController: NavController) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "10",
+                    text = "%.2f".format(saldo),
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold
                 )
             }
         }
 
-        // Contenuto scrollabile
+        // CONTENUTO
         Column(
             modifier = Modifier
                 .padding(16.dp)
@@ -88,7 +105,6 @@ fun GuadagnaCoinScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Sezione Cards
             ActionCardStyled(
                 icon = Icons.Default.PlayArrow,
                 title = stringResource(R.string.guarda_ads),
@@ -142,9 +158,8 @@ fun GuadagnaCoinScreen(navController: NavController) {
                     context.startActivity(shareIntent)
                 }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
+
         if (openDialog.value) {
             AlertDialog(
                 onDismissRequest = { openDialog.value = false },
@@ -161,7 +176,6 @@ fun GuadagnaCoinScreen(navController: NavController) {
                 }
             )
         }
-
     }
 }
 
@@ -217,11 +231,4 @@ fun ActionCardStyled(
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun GuadagnaCoinScreenPreview() {
-    GuadagnaCoinScreen(navController = rememberNavController())
 }

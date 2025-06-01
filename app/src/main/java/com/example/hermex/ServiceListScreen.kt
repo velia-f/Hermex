@@ -67,23 +67,6 @@ fun ServiceListScreen(navController: NavController) {
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            listOf("Design", "Dev", "Marketing", "AI", "Writing", "Altro").forEach {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Brush.horizontalGradient(listOf(Color(0xFF6A11CB), Color(0xFF2575FC))))
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) {
-                    Text(it, color = Color.White, fontWeight = FontWeight.SemiBold)
-                }
-            }
-        }
 
         Spacer(modifier = Modifier.height(20.dp))
 
@@ -144,7 +127,7 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
                 )
                 Text("Autore: ${service.autore}", fontSize = 12.sp, color = Color.DarkGray)
 
-                Text("Prezzo: €${"%.2f".format(service.prezzo)}", fontSize = 12.sp, color = Color.Black)
+                Text("Prezzo: ${"%.2f".format(service.prezzo)}", fontSize = 12.sp, color = Color.Black)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val fullStars = service.rating.toInt()

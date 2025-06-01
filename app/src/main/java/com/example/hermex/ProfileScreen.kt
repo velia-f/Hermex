@@ -22,9 +22,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,7 +92,6 @@ fun ProfileScreen(navController: NavController) {
             Toast.makeText(context, "Errore nel caricamento", Toast.LENGTH_SHORT).show()
         }
     }
-
 
     Column(
         modifier = Modifier
@@ -212,10 +213,101 @@ fun ProfileScreen(navController: NavController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(160.dp)
-                .background(Color(0xFFE0E0E0), shape = RoundedCornerShape(12.dp))
-                .padding(16.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF6A11CB), Color(0xFF2575FC))
+                    )
+                )
+                .clickable {
+                    navController.navigate("miei_servizi")
+                }
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Text("📦 Spazio riservato ai tuoi servizi")
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "📦 I tuoi servizi",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Clicca per visualizzare e gestire i tuoi servizi",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp
+                )
+            }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFF11998E), Color(0xFF38EF7D)) // Verde
+                    )
+                )
+                .clickable {
+                    navController.navigate("ordini_ricevuti")
+                }
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "📥 Ordini ricevuti",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Gestisci gli ordini ricevuti sui tuoi servizi",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(160.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(
+                    Brush.verticalGradient(
+                        listOf(Color(0xFFFF512F), Color(0xFFDD2476)) // Rosso/rosa
+                    )
+                )
+                .clickable {
+                    navController.navigate("lascia_recensioni")
+                }
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "⭐ Recensioni da lasciare",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Completa le recensioni dei servizi acquistati",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 14.sp
+                )
+            }
+        }
+
+
     }
 }
