@@ -25,7 +25,6 @@ import retrofit2.http.*
 
 data class ReviewItem(
 
-
     val id_ordine: Int,
     val nome_servizio: String,
     val prezzo: Double,
