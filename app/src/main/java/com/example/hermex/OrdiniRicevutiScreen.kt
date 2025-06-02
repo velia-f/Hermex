@@ -101,7 +101,7 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(ordine.nome_servizio, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text("Acquirente: ${ordine.acquirente}")
-                        Text("Prezzo: €${String.format("%.2f", ordine.prezzo)}")
+                        Text("Prezzo: ${String.format("%.2f", ordine.prezzo)}")
                         Text("Data: ${formatDate(ordine.data_acquisto)}")
 
                         Spacer(modifier = Modifier.height(12.dp))

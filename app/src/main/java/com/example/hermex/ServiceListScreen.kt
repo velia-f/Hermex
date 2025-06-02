@@ -96,7 +96,7 @@ fun ServiceListScreen(navController: NavController) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "Come test stiamo usando un hosting gratuito, è lento nel rispondere =(",
+                    "Come test stiamo usando un hosting gratuito ,L'istanza gratuita si arresterà in caso di inattività, il che potrebbe ritardare le richieste di 50 secondi o più.",
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
