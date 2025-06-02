@@ -66,7 +66,6 @@ fun GuadagnaCoinScreen(navController: NavController) {
             .fillMaxSize()
             .background(Color.White)
     ) {
-        // TOP BAR con saldo
         Row(
             modifier = Modifier
                 .fillMaxWidth()

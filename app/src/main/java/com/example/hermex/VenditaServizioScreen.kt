@@ -216,7 +216,6 @@ fun VenditaServizioScreen(navController: NavController) {
     }
 }
 
-// DATA E API
 
 data class CreaServizioRequest(
     val nome_servizio: String,
@@ -226,7 +225,6 @@ data class CreaServizioRequest(
     val immagine: String
 )
 
-//data class MessageResponse(val message: String)
 
 interface ServizioApi {
     @POST("api/servizi")

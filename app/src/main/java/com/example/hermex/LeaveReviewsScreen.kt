@@ -53,12 +53,10 @@ fun LeaveReviewsScreen(navController: NavController) {
     var token by remember { mutableStateOf<String?>(null) }
     var reviewList by remember { mutableStateOf<List<ReviewItem>>(emptyList()) }
 
-    // Carica token asincronamente
     LaunchedEffect(Unit) {
         token = TokenManager.getToken(context)
     }
 
-    // Carica recensioni da fare
     LaunchedEffect(token) {
         if (token != null) {
             try {

@@ -46,6 +46,7 @@ fun ServiceListScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
     var servizi by remember { mutableStateOf<List<Service>>(emptyList()) }
     var searchText by remember { mutableStateOf("") }
+    var isLoading by remember { mutableStateOf(true) }
 
     LaunchedEffect(true) {
         if (token == null) {
@@ -63,11 +64,16 @@ fun ServiceListScreen(navController: NavController) {
             servizi = api.getServizi("Bearer $token")
         } catch (e: Exception) {
             Log.e("API_ERROR", "Errore nel recupero servizi", e)
+        } finally {
+            isLoading = false
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
         Spacer(modifier = Modifier.height(20.dp))
 
         OutlinedTextField(
@@ -81,12 +87,28 @@ fun ServiceListScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(servizi.filter {
-                it.nome_servizio.contains(searchText, true) || it.descrizione_servizio.contains(searchText, true)
-            }) { service ->
-                ServiceItem(service) {
-                    navController.navigate("service_detail/${service.id_servizio}")
+        if (isLoading) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Come test stiamo usando un hosting gratuito, è lento nel rispondere =(",
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                items(servizi.filter {
+                    it.nome_servizio.contains(searchText, true) || it.descrizione_servizio.contains(searchText, true)
+                }) { service ->
+                    ServiceItem(service) {
+                        navController.navigate("service_detail/${service.id_servizio}")
+                    }
                 }
             }
         }
