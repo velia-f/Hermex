@@ -2,28 +2,31 @@ package com.example.hermex
 
 import android.content.Intent
 import android.net.Uri
-import android.util.Base64
+import android.os.Build
 import android.widget.Toast
-import androidx.compose.foundation.*
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
-import org.json.JSONObject
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 data class OrdineRicevuto(
     val id_ordine: Int,
@@ -63,7 +66,7 @@ fun OrdiniRicevutiScreen(navController: NavController) {
 
         try {
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:3000/")
+                .baseUrl("https://hermex-api.onrender.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
@@ -99,7 +102,7 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                         Text(ordine.nome_servizio, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         Text("Acquirente: ${ordine.acquirente}")
                         Text("Prezzo: €${String.format("%.2f", ordine.prezzo)}")
-                        Text("Data: ${ordine.data_acquisto}")
+                        Text("Data: ${formatDate(ordine.data_acquisto)}")
 
                         Spacer(modifier = Modifier.height(12.dp))
 
@@ -107,25 +110,9 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                             "in_attesa" -> {
                                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                     Button(onClick = {
-                                        coroutineScope.launch {
-                                            val retrofit = Retrofit.Builder()
-                                                .baseUrl("http://10.0.2.2:3000/")
-                                                .addConverterFactory(GsonConverterFactory.create())
-                                                .build()
-
-                                            val api = retrofit.create(OrdiniApi::class.java)
-                                            try {
-                                                api.aggiornaOrdine(
-                                                    ordine.id_ordine,
-                                                    "Bearer $token",
-                                                    mapOf("nuovaStato" to "accettato")
-                                                )
-                                                ordini = ordini.map {
-                                                    if (it.id_ordine == ordine.id_ordine)
-                                                        it.copy(stato = "accettato") else it
-                                                }
-                                            } catch (e: Exception) {
-                                                Toast.makeText(context, "Errore aggiornamento", Toast.LENGTH_SHORT).show()
+                                        aggiornaStatoOrdine(ordine, "accettato", token!!, context, coroutineScope) {
+                                            ordini = ordini.map {
+                                                if (it.id_ordine == ordine.id_ordine) it.copy(stato = "accettato") else it
                                             }
                                         }
                                     }) {
@@ -133,25 +120,9 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                                     }
 
                                     OutlinedButton(onClick = {
-                                        coroutineScope.launch {
-                                            val retrofit = Retrofit.Builder()
-                                                .baseUrl("http://10.0.2.2:3000/")
-                                                .addConverterFactory(GsonConverterFactory.create())
-                                                .build()
-
-                                            val api = retrofit.create(OrdiniApi::class.java)
-                                            try {
-                                                api.aggiornaOrdine(
-                                                    ordine.id_ordine,
-                                                    "Bearer $token",
-                                                    mapOf("nuovaStato" to "rifiutato")
-                                                )
-                                                ordini = ordini.map {
-                                                    if (it.id_ordine == ordine.id_ordine)
-                                                        it.copy(stato = "rifiutato") else it
-                                                }
-                                            } catch (e: Exception) {
-                                                Toast.makeText(context, "Errore aggiornamento", Toast.LENGTH_SHORT).show()
+                                        aggiornaStatoOrdine(ordine, "rifiutato", token!!, context, coroutineScope) {
+                                            ordini = ordini.map {
+                                                if (it.id_ordine == ordine.id_ordine) it.copy(stato = "rifiutato") else it
                                             }
                                         }
                                     }) {
@@ -159,7 +130,6 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                                     }
                                 }
                             }
-
                             else -> {
                                 Text("Stato: ${ordine.stato}", color = when (ordine.stato) {
                                     "accettato" -> Color(0xFF4CAF50)
@@ -185,6 +155,45 @@ fun OrdiniRicevutiScreen(navController: NavController) {
                     }
                 }
             }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDate(rawDate: String): String {
+    return try {
+        val parsed = ZonedDateTime.parse(rawDate)
+        val formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm", Locale.getDefault())
+        parsed.format(formatter)
+    } catch (e: Exception) {
+        rawDate
+    }
+}
+
+fun aggiornaStatoOrdine(
+    ordine: OrdineRicevuto,
+    nuovoStato: String,
+    token: String,
+    context: android.content.Context,
+    coroutineScope: CoroutineScope,
+    onSuccess: () -> Unit
+) {
+    coroutineScope.launch {
+        try {
+            val retrofit = Retrofit.Builder()
+                .baseUrl("https://hermex-api.onrender.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+
+            val api = retrofit.create(OrdiniApi::class.java)
+            api.aggiornaOrdine(
+                ordine.id_ordine,
+                "Bearer $token",
+                mapOf("nuovaStato" to nuovoStato)
+            )
+            onSuccess()
+        } catch (e: Exception) {
+            Toast.makeText(context, "Errore aggiornamento", Toast.LENGTH_SHORT).show()
         }
     }
 }

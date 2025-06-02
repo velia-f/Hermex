@@ -63,7 +63,7 @@ fun LeaveReviewsScreen(navController: NavController) {
         if (token != null) {
             try {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:3000/")
+                    .baseUrl("https://hermex-api.onrender.com/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val api = retrofit.create(ReviewApi::class.java)
@@ -135,7 +135,7 @@ fun LeaveReviewsScreen(navController: NavController) {
                                     isSubmitting = true
                                     try {
                                         val retrofit = Retrofit.Builder()
-                                            .baseUrl("http://10.0.2.2:3000/")
+                                            .baseUrl("https://hermex-api.onrender.com/")
                                             .addConverterFactory(GsonConverterFactory.create())
                                             .build()
                                         val api = retrofit.create(ReviewApi::class.java)

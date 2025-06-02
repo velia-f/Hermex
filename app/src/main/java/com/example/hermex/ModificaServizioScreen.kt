@@ -59,7 +59,7 @@ fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
 
         try {
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:3000/")
+                .baseUrl("https://hermex-api.onrender.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
@@ -70,6 +70,7 @@ fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
             descrizione.value = service.descrizione_servizio
             prezzo.value = service.prezzo.toString()
             immagineUrl.value = service.immagine_servizio
+            localizzazione.value = service.localizzazione
 
             isLoading.value = false
         } catch (e: Exception) {
@@ -122,7 +123,7 @@ fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
                     }
 
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://10.0.2.2:3000/")
+                        .baseUrl("https://hermex-api.onrender.com/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
 
@@ -175,7 +176,7 @@ fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
                     }
 
                     val retrofit = Retrofit.Builder()
-                        .baseUrl("http://10.0.2.2:3000/")
+                        .baseUrl("https://hermex-api.onrender.com/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build()
 
@@ -263,13 +264,18 @@ fun ModificaServizioScreen(serviceId: Int, navController: NavController) {
             Text("Prezzo", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
             OutlinedTextField(
                 value = prezzo.value,
-                onValueChange = { prezzo.value = it },
+                onValueChange = { },
                 placeholder = { Text("Es. 10.0") },
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 shape = RoundedCornerShape(12.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                readOnly = true,
+                enabled = false,
                 isError = showErrors.value && prezzo.value.isBlank()
             )
+
 
             Text("Localizzazione", fontWeight = FontWeight.Bold, modifier = Modifier.padding(top = 16.dp))
             OutlinedTextField(

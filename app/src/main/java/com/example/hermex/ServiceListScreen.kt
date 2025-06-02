@@ -55,7 +55,7 @@ fun ServiceListScreen(navController: NavController) {
 
         try {
             val retrofit = Retrofit.Builder()
-                .baseUrl("http://10.0.2.2:3000/")
+                .baseUrl("https://hermex-api.onrender.com/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
 
@@ -128,6 +128,14 @@ fun ServiceItem(service: Service, onClick: () -> Unit) {
                 Text("Autore: ${service.autore}", fontSize = 12.sp, color = Color.DarkGray)
 
                 Text("Prezzo: ${"%.2f".format(service.prezzo)}", fontSize = 12.sp, color = Color.Black)
+                Text(
+                    text = "Localizzazione: ${service.localizzazione}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     val fullStars = service.rating.toInt()

@@ -48,7 +48,7 @@ fun GuadagnaCoinScreen(navController: NavController) {
             val token = getToken(context)
             if (token != null) {
                 val retrofit = Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:3000/")
+                    .baseUrl("https://hermex-api.onrender.com/")
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
                 val api = retrofit.create(SaldoApi::class.java)

@@ -22,7 +22,7 @@ interface UserApi {
 
 fun provideUserApi(): UserApi {
     return Retrofit.Builder()
-        .baseUrl("http://10.0.2.2:3000/")
+        .baseUrl("https://hermex-api.onrender.com/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
         .create(UserApi::class.java)

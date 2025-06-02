@@ -210,7 +210,7 @@ fun RegisterScreen(navController: NavController) {
                             val mediaType = "application/json".toMediaTypeOrNull()
                             val body = RequestBody.create(mediaType, json)
                             val request = Request.Builder()
-                                .url("http://10.0.2.2:3000/register")
+                                .url("https://hermex-api.onrender.com/register")
                                 .post(body)
                                 .build()
 
